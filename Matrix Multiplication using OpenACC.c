@@ -1,59 +1,57 @@
 // Matrix multiplication using OpenACC
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <openacc.h>
 
-#define N 1000
-
-// Matrix data type
-typedef struct {
-  float *data;
-  int rows;
-  int cols;
-} Matrix;
-
-// Allocate memory for a matrix
-Matrix allocate_matrix(int rows, int cols) {
-  Matrix mat;
-  mat.data = (float*)malloc(sizeof(float) * rows * cols);
-  mat.rows = rows;
-  mat.cols = cols;
-  return mat;
-}
-
-// Free memory for a matrix
-void free_matrix(Matrix mat) {
-  free(mat.data);
-}
-
-// Initialize a matrix with random values
-void init_matrix(Matrix mat) {
-  for (int i = 0; i < mat.rows * mat.cols; i++) {
-    mat.data[i] = rand() / (float)RAND_MAX;
-  }
-}
-
-// Serial matrix multiplication
-Matrix multiply_matrix(Matrix mat1, Matrix mat2) {
-  Matrix result = allocate_matrix(mat1.rows, mat2.cols);
-
-  for (int i = 0; i < result.rows; i++) {
-    for (int j = 0; j < result.cols; j++) {
-      float sum = 0;
-      for (int k = 0; k < mat1.cols; k++) {
-        sum += mat1.data[i * mat1.cols + k] * mat2.data[k * mat2.cols + j];
-      }
-      result.data[i * result.cols + j] = sum;
+void matrix_multiply(float *a, float *b, float *c, int m, int n, int p) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < p; j++) {
+            c[i*p + j] = 0.0f;
+            for (int k = 0; k < n; k++) {
+                c[i*p + j] += a[i*n + k] * b[k*p + j];
+            }
+        }
     }
-  }
-
-  return result;
 }
 
-// Parallel matrix multiplication using OpenACC
-Matrix multiply_matrix_parallel(Matrix mat1, Matrix mat2) {
-  Matrix result = allocate_matrix(mat1.rows, mat2.cols);
+int main() {
+    const int M = 1000, N = 1000, P = 1000;
+    float a[M*N], b[N*P], c[M*P];
 
-  #pragma acc data copyin(mat1.data[0:mat1.rows*mat1.cols], mat2.data[0:mat2.rows*mat2.cols]) copyout(result.data[0:result.rows*result.cols])
-  {
-    #
+    // Initialize arrays
+    for (int i = 0; i < M; i++) {
+        for (int j = 0; j < N; j++) {
+            a[i*N + j] = (float)i*j;
+        }
+    }
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < P; j++) {
+            b[i*P + j] = (float)i*j;
+        }
+    }
+
+    // Accelerate the computation using OpenACC
+    #pragma acc data copyin(a[0:M*N], b[0:N*P]), copyout(c[0:M*P])
+    {
+        #pragma acc parallel loop collapse(2)
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < P; j++) {
+                float sum = 0.0f;
+                for (int k = 0; k < N; k++) {
+                    sum += a[i*N + k] * b[k*P + j];
+                }
+                c[i*P + j] = sum;
+            }
+        }
+    }
+
+    // Print the results
+    for (int i = 0; i < M; i++) {
+        for (int j = 0; j < P; j++) {
+            printf("c[%d][%d] = %f\n", i, j, c[i*P + j]);
+        }
+    }
+
+    return 0;
+}
+
