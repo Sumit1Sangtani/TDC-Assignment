@@ -1,4 +1,4 @@
-//Matrix multiplication using OpenAcc
+//Matrix multiplication using OpenACC
 
 In this example, the #pragma acc data directive tells the compiler to generate GPU-accelerated code for the block of code that follows, which includes the matrix multiplication function. 
 The copyin and copyout clauses specify which arrays should be copied to and from the GPU's memory.
