@@ -1,3 +1,5 @@
+//Sumit Santosh Sangtani
+//029405283
 //Matrix multiplication using OpenACC
 
 In this example, the #pragma acc data directive tells the compiler to generate GPU-accelerated code for the block of code that follows, which includes the matrix multiplication function. 
