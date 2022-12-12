@@ -45,7 +45,7 @@ int main() {
         }
     }
 
-    // Print the results
+    // Printing the results
     for (int i = 0; i < M; i++) {
         for (int j = 0; j < P; j++) {
             printf("c[%d][%d] = %f\n", i, j, c[i*P + j]);
