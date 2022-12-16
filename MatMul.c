@@ -1,4 +1,4 @@
-// Matrix multiplication using OpenACC
+// Matrix Multiplication using OpenACC
 
 #include <stdio.h>
 #include <openacc.h>
