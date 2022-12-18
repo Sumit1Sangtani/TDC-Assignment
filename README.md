@@ -25,3 +25,4 @@ A) Without the result validation\
 	pgcc -acc -fast ta=nvidia -Minfo=accel MatMulOpenAcc.c -o MatMulOpenAcc\
 B) With result validation (OpenMP threaded)\
 	pgcc -mp -acc -fast ta=nvidia -Minfo=accel -DCHECK  MatMulOpenAcc.c -o MatMulOpenAcc-ompcheck
+	
